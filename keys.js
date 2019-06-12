@@ -1,7 +1,7 @@
 //verify key file is loaded
 console.log('database is loaded');
 //export database env
-exports.database = {
+exports.sqlDatabase = {
     host: process.env.DATABASE_HOST,
     port: process.env.DATABASE_PORT,
     user: process.env.DATABASE_USER,
