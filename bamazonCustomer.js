@@ -24,4 +24,28 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
+
 });
+
+// Display all available items
+// User prompt with questions
+    // Option to view cart
+    // Ask for ID of item they want
+    // Ask how many they'd like
+// Placing order, check against quantity in database
+    // If there is enough - order success message, subtract from database
+    // If there isn't enought - insufficient quantity message and prevent order from going through
+        // Redisplay all available items
+// Add item(s) and cost to shopping cart
+// Ask if user would like to purchase another item or view cart
+    // If they would like to purchase other items - redisplay all available items
+    // If they would like to view the cart - display all items they have selected
+// User is viewing cart
+    // Ask for address and payment information
+    // Provide final cost and amount owed - prompt user to okay purchase
+        // If user declines purchase - take them back to the cart
+        // If user accepts purchase - purchase success message, display all available items
+
+
+
+
