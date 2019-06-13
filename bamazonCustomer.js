@@ -22,16 +22,52 @@ connection.connect(function (err) {
 });
 
 // Display all available items
-function displayProducts () {
+function displayProducts() {
     connection.query("SELECT * FROM products", function (error, results) {
         if (error) throw error;
         console.table(results);
+        // User prompt with questions
+        inquirer
+            // Option to view cart
+            .prompt([
+                {
+                    name: "cartView",
+                    type: "confirm",
+                    message: "Would you like to view your cart?",
+                    default: true
+                }
+            ])
+            .then(function (response) {
+                if (response.cartView) {
+                    // Go to cart
+                    viewCart();
+                } else {
+                    // Ask for ID of item they want
+                    inquirer
+                        .prompt([
+                            {
+                                name: "Product-ID-Selection",
+                                type: "rawlist",
+                                choices: function () {
+                                    var choicesArr = [];
+                                    for (var i = 0; i < results.length; i++) {
+                                        choicesArr.push(results[i].id);
+                                    }
+                                    return choicesArr;
+                                }
+                            }
+                        ])
+                }
+            })
+        // Ask how many they'd like
     })
 }
-// User prompt with questions
-    // Option to view cart
-    // Ask for ID of item they want
-    // Ask how many they'd like
+
+// View cart 
+function viewCart() {
+    console.log("view cart success");
+}
+
 // Placing order, check against quantity in database
     // If there is enough - order success message, subtract from database
     // If there isn't enought - insufficient quantity message and prevent order from going through
