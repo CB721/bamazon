@@ -5,9 +5,6 @@ var mysql = require("mysql");
 //env to hide database password
 require("dotenv").config();
 
-//sql variable
-// var sqlDatabase = new sqlDatabase (keys.sqlDatabase);
-
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -24,10 +21,16 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
-
+    displayProducts()
 });
 
 // Display all available items
+function displayProducts () {
+    connection.query("SELECT * FROM products", function (error, results) {
+        if (error) throw error;
+        console.log(results);
+    })
+}
 // User prompt with questions
     // Option to view cart
     // Ask for ID of item they want
