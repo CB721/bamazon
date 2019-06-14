@@ -17,7 +17,6 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    console.log("connected as id " + connection.threadId + "\n");
     displayProducts()
 });
 
@@ -46,7 +45,7 @@ function displayProducts() {
                     inquirer
                         .prompt([
                             {
-                                name: "Product-ID-Selection",
+                                name: "productIDSelection",
                                 type: "rawlist",
                                 choices: function () {
                                     var choicesArr = [];
@@ -56,16 +55,34 @@ function displayProducts() {
                                     return choicesArr;
                                 }
                             }
-                        ])
+                        ]).then(function (productSelction) {
+                            var userSelection = connection.query("SELECT product_name FROM products WHERE ?",
+                                {
+                                    id: productSelction.productIDSelection
+                                },
+                                function (error) {
+                                    if (error) throw error;
+                                    console.log(userSelection);
+                                    orderQuantity();
+                                }
+                            )
+                        })
                 }
             })
-        // Ask how many they'd like
     })
 }
+
 
 // View cart 
 function viewCart() {
     console.log("view cart success");
+    console.log("--------------------------------");
+    displayProducts()
+}
+
+// Ask how many they'd like
+function orderQuantity() {
+    console.log("Order quantity");
 }
 
 // Placing order, check against quantity in database
