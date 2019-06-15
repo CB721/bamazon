@@ -89,12 +89,24 @@ function stockUpdate(orderQuantity, itemID) {
     // Select by ID
     connection.query("SELECT * FROM products WHERE id = " + itemID, function (error, results) {
         if (error) throw error;
-        console.table(results);
+        // Quantity available in database
+        var dbQuantity = results[0].stock_quantity;
+        // Updated quantity available in database
+        var updateQuantity = dbQuantity - orderQuantity;
+        // If there is enough - order success message, subtract from database
+        if (updateQuantity > 0) {
+            // Order success message
+            console.log("Added " + orderQuantity + " " + results[0].product_name + "'s to your cart!\n");
+            // 
+        } else {
+            // If there isn't enought - insufficient quantity message and prevent order from going through
+            console.log("Insufficient quantity.  Please check availability and try again.\n");
+            // Redisplay all available items
+            displayProducts()
+        }
     })
 }
-    // If there is enough - order success message, subtract from database
-    // If there isn't enought - insufficient quantity message and prevent order from going through
-        // Redisplay all available items
+    
 // Add item(s) and cost to shopping cart
 // Ask if user would like to purchase another item or view cart
     // If they would like to purchase other items - redisplay all available items
