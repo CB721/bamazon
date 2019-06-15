@@ -86,6 +86,11 @@ function viewCart() {
 function stockUpdate(orderQuantity, itemID) {
     console.log("Order Quanity: " + orderQuantity);
     console.log("Item ID: " + itemID);
+    // Select by ID
+    connection.query("SELECT * FROM products WHERE id = " + itemID, function (error, results) {
+        if (error) throw error;
+        console.table(results);
+    })
 }
     // If there is enough - order success message, subtract from database
     // If there isn't enought - insufficient quantity message and prevent order from going through
