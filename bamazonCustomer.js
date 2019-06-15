@@ -41,35 +41,40 @@ function displayProducts() {
                     // Go to cart
                     viewCart();
                 } else {
-                    // Ask for ID of item they want
-                    inquirer
-                        .prompt([
-                            {
-                                name: "productIDSelection",
-                                type: "rawlist",
-                                choices: function () {
-                                    var choicesArr = [];
-                                    for (var i = 0; i < results.length; i++) {
-                                        choicesArr.push(results[i].id);
-                                    }
-                                    return choicesArr;
-                                }
-                            }
-                        ]).then(function (productSelction) {
-                            var userSelection = connection.query("SELECT product_name FROM products WHERE ?",
-                                {
-                                    id: productSelction.productIDSelection
-                                },
-                                function (error) {
-                                    if (error) throw error;
-                                    console.log(userSelection);
-                                    orderQuantity();
-                                }
-                            )
-                        })
+                    makePurchase(results);
                 }
             })
     })
+}
+
+// Make purchase
+function makePurchase(results) {
+    // Ask for ID of item they want
+    inquirer
+        .prompt([
+            {
+                name: "productIDSelection",
+                type: "rawlist",
+                choices: function () {
+                    var choicesArr = [];
+                    for (var i = 0; i < results.length; i++) {
+                        choicesArr.push(results[i].id);
+                    }
+                    return choicesArr;
+                }
+            }
+        ]).then(function (productSelction) {
+            var userSelection = connection.query("SELECT product_name FROM products WHERE ?",
+                {
+                    id: productSelction.productIDSelection
+                },
+                function (error) {
+                    if (error) throw error;
+                    console.log(userSelection);
+                    orderQuantity();
+                }
+            )
+        })
 }
 
 
