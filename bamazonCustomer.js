@@ -53,7 +53,7 @@ function makePurchase(results) {
     inquirer
         .prompt([
             {
-                name: "productIDSelection",
+                name: "productID",
                 type: "rawlist",
                 choices: function () {
                     var choicesArr = [];
@@ -62,21 +62,18 @@ function makePurchase(results) {
                     }
                     return choicesArr;
                 }
+            },
+            {
+                name: "quantity",
+                type: "input",
+                message: "How many would you like to purchase?"
             }
-        ]).then(function (productSelction) {
-            var userSelection = connection.query("SELECT product_name FROM products WHERE ?",
-                {
-                    id: productSelction.productIDSelection
-                },
-                function (error) {
-                    if (error) throw error;
-                    console.log(userSelection);
-                    orderQuantity();
-                }
-            )
+        ]).then(function (answer) {
+            var orderQuantity = answer.quantity;
+            var itemID = answer.productID;
+            stockUpdate(orderQuantity, itemID);
         })
 }
-
 
 // View cart 
 function viewCart() {
@@ -85,12 +82,11 @@ function viewCart() {
     displayProducts()
 }
 
-// Ask how many they'd like
-function orderQuantity() {
-    console.log("Order quantity");
-}
-
 // Placing order, check against quantity in database
+function stockUpdate(orderQuantity, itemID) {
+    console.log("Order Quanity: " + orderQuantity);
+    console.log("Item ID: " + itemID);
+}
     // If there is enough - order success message, subtract from database
     // If there isn't enought - insufficient quantity message and prevent order from going through
         // Redisplay all available items
