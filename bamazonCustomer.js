@@ -81,10 +81,16 @@ var cart = [];
 
 // View cart 
 function viewCart() {
-    console.log(cart);
+    // Check if anything is in the cart
+    if (cart.length > 0) {
+        console.log(cart);
+    } else {
+        console.log("Sorry, your cart is empty.  Please add an item and check back later.\n");
+        console.log("Taking you back to the home page.\n");
+        displayProducts()
+    }
     // Display total of each item with price
     // Total price of order
-    displayProducts()
 }
 
 // Placing order, check against quantity in database
