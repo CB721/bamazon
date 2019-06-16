@@ -22,6 +22,7 @@ connection.connect(function (err) {
 
 // Display all available items
 function displayProducts() {
+    console.log("Welcome to Bamazon!\n")
     connection.query("SELECT * FROM products", function (error, results) {
         if (error) throw error;
         console.table(results);
@@ -45,6 +46,29 @@ function displayProducts() {
                 }
             })
     })
+}
+
+// Finalize purchase
+function finalizePurchase () {
+    inquirer
+        .prompt([
+            {
+                name: "purchase",
+                type: "confirm",
+                message: "Would you like to proceed with your purchase?",
+                default: true
+            }
+        ]).then(function (response) {
+            if (response.purchase) {
+                console.log("You have completed your purchase.  Thank you for your business!\n");
+                console.log("---------------------------------------------------------------\n");
+                // empty cart function
+                emptyCart();
+                displayProducts();
+            } else {
+                displayProducts();
+            }
+        })
 }
 
 // Make purchase
@@ -75,6 +99,11 @@ function makePurchase(results) {
         })
 }
 
+// Clear all values from cart array
+function emptyCart() {
+    cart.length = 0;
+}
+
 // Empty array for the cart
 var cart = [];
 
@@ -87,7 +116,6 @@ function viewCart() {
             var cartID = cart[i].id;
             displayCart(cartID, itemQuantity);
         }
-        displayProducts();
     } else {
         console.log("Sorry, your cart is empty.  Please add an item and check back later.\n");
         console.log("Taking you back to the home page...\n");
@@ -110,6 +138,7 @@ function displayCart(id, quantity) {
         }
         // Log order total
         console.log("Your order total is $" + orderTotal);
+        finalizePurchase();
     })
 }
 
@@ -146,11 +175,6 @@ function stockUpdate(orderQuantity, itemID) {
     })
 }
 
-
-// Add item(s) and cost to shopping cart
-// Ask if user would like to purchase another item or view cart
-    // If they would like to purchase other items - redisplay all available items
-    // If they would like to view the cart - display all items they have selected
 // User is viewing cart
     // Ask for address and payment information
     // Provide final cost and amount owed - prompt user to okay purchase
