@@ -81,7 +81,6 @@ var cart = [];
 // View cart 
 function viewCart() {
     // Check if anything is in the cart
-    console.log(cart);
     if (cart.length > 0) {
         for (var i = 0; i < cart.length; i++) {
             var itemQuantity = cart[i].quantity
@@ -91,27 +90,31 @@ function viewCart() {
         displayProducts();
     } else {
         console.log("Sorry, your cart is empty.  Please add an item and check back later.\n");
-        console.log("Taking you back to the home page.\n");
+        console.log("Taking you back to the home page...\n");
         displayProducts()
     }
-    // Display total of each item with price
-    // Total price of order
 }
 
 function displayCart(id, quantity) {
+    var orderTotal = 0;
     connection.query("SELECT product_name, price FROM products WHERE id = " + id, function (error, results) {
         if (error) throw error;
-        var itemPrice = results[0].price;
-        var itemTotal = itemPrice * quantity;
-        console.table(results[0].product_name + " Quantity: " + quantity + " Price per item: " + itemPrice + " Item Total: " + itemTotal);
+        for (var i = 0; i < results.length; i++) {
+            // Get price from db
+            var itemPrice = results[0].price;
+            // Item total rounded to two decimal places
+            var itemTotal = (itemPrice * quantity).toFixed(2);
+            // Log each item with total
+            console.log(results[0].product_name + " Quantity: " + quantity + " Price per item: $" + itemPrice + " Item Total: $" + itemTotal + "\n");
+            orderTotal += itemTotal;
+        }
+        // Log order total
+        console.log("Your order total is $" + orderTotal);
     })
 }
 
-
 // Placing order, check against quantity in database
 function stockUpdate(orderQuantity, itemID) {
-    console.log("Order Quanity: " + orderQuantity);
-    console.log("Item ID: " + itemID);
     // Select by ID
     connection.query("SELECT * FROM products WHERE id = " + itemID, function (error, results) {
         if (error) throw error;
@@ -127,8 +130,8 @@ function stockUpdate(orderQuantity, itemID) {
             connection.query("UPDATE products SET stock_quantity =' " + updateQuantity + " 'WHERE id = " + itemID, function (error, results2) {
                 if (error) throw error;
             })
-            // Push value to cart array
-            var orderValue = {id: itemID, quantity: orderQuantity};
+            // Push object to cart array
+            var orderValue = { id: itemID, quantity: orderQuantity };
             // Push to cart array
             cart.push(orderValue)
             // Go to cart
@@ -136,14 +139,14 @@ function stockUpdate(orderQuantity, itemID) {
         } else {
             // If there isn't enought - insufficient quantity message and prevent order from going through
             console.log("Insufficient quantity.  Please check availability and try again.\n");
-            console.log("---------------------------\n");
+            console.log("----------------------------------------------------------------\n");
             // Redisplay all available items
             displayProducts()
         }
     })
 }
 
-    
+
 // Add item(s) and cost to shopping cart
 // Ask if user would like to purchase another item or view cart
     // If they would like to purchase other items - redisplay all available items
