@@ -75,15 +75,20 @@ function makePurchase(results) {
         })
 }
 
-// Empty array for cart
-    // ID : Quantity
+// Empty array for the cart
 var cart = [];
 
 // View cart 
 function viewCart() {
     // Check if anything is in the cart
+    console.log(cart);
     if (cart.length > 0) {
-        console.log(cart);
+        for (var i = 0; i < cart.length; i++) {
+            var itemQuantity = cart[i].quantity
+            var cartID = cart[i].id;
+            displayCart(cartID, itemQuantity);
+        }
+        displayProducts();
     } else {
         console.log("Sorry, your cart is empty.  Please add an item and check back later.\n");
         console.log("Taking you back to the home page.\n");
@@ -92,6 +97,16 @@ function viewCart() {
     // Display total of each item with price
     // Total price of order
 }
+
+function displayCart(id, quantity) {
+    connection.query("SELECT product_name, price FROM products WHERE id = " + id, function (error, results) {
+        if (error) throw error;
+        var itemPrice = results[0].price;
+        var itemTotal = itemPrice * quantity;
+        console.table(results[0].product_name + " Quantity: " + quantity + " Price per item: " + itemPrice + " Item Total: " + itemTotal);
+    })
+}
+
 
 // Placing order, check against quantity in database
 function stockUpdate(orderQuantity, itemID) {
@@ -112,10 +127,10 @@ function stockUpdate(orderQuantity, itemID) {
             connection.query("UPDATE products SET stock_quantity =' " + updateQuantity + " 'WHERE id = " + itemID, function (error, results2) {
                 if (error) throw error;
             })
-            // Value to go to cart
-            var cartValue = itemID + " : " + orderQuantity;
+            // Push value to cart array
+            var orderValue = {id: itemID, quantity: orderQuantity};
             // Push to cart array
-            cart.push(cartValue)
+            cart.push(orderValue)
             // Go to cart
             viewCart();
         } else {
