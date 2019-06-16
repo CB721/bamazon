@@ -75,10 +75,15 @@ function makePurchase(results) {
         })
 }
 
+// Empty array for cart
+    // ID : Quantity
+var cart = [];
+
 // View cart 
 function viewCart() {
-    console.log("view cart success");
-    console.log("--------------------------------");
+    console.log(cart);
+    // Display total of each item with price
+    // Total price of order
     displayProducts()
 }
 
@@ -100,8 +105,11 @@ function stockUpdate(orderQuantity, itemID) {
             // Subtract from database
             connection.query("UPDATE products SET stock_quantity =' " + updateQuantity + " 'WHERE id = " + itemID, function (error, results2) {
                 if (error) throw error;
-                console.log(results2);
             })
+            // Value to go to cart
+            var cartValue = itemID + " : " + orderQuantity;
+            // Push to cart array
+            cart.push(cartValue)
             // Go to cart
             viewCart();
         } else {
@@ -124,7 +132,3 @@ function stockUpdate(orderQuantity, itemID) {
     // Provide final cost and amount owed - prompt user to okay purchase
         // If user declines purchase - take them back to the cart
         // If user accepts purchase - purchase success message, display all available items
-
-
-
-
