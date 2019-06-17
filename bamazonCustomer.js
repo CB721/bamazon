@@ -22,7 +22,7 @@ connection.connect(function (err) {
 
 // Display all available items
 function displayProducts() {
-    console.log("Welcome to Bamazon!\n")
+    console.log("Welcome to Bamazon!\n");
     connection.query("SELECT * FROM products", function (error, results) {
         if (error) throw error;
         console.table(results);
@@ -49,7 +49,7 @@ function displayProducts() {
 }
 
 // Finalize purchase
-function finalizePurchase () {
+function finalizePurchase (userInfo) {
     inquirer
         .prompt([
             {
@@ -60,7 +60,8 @@ function finalizePurchase () {
             }
         ]).then(function (response) {
             if (response.purchase) {
-                console.log("You have completed your purchase.  Thank you for your business!\n");
+                console.log(userInfo.first_name + " you have completed your purchase.  Thank you for your business!\n");
+                console.log("Signing out...\n");
                 console.log("---------------------------------------------------------------\n");
                 // empty cart function
                 emptyCart();
@@ -73,12 +74,14 @@ function finalizePurchase () {
 
 // Make purchase
 function makePurchase(results) {
+    console.log("\n");
     // Ask for ID of item they want
     inquirer
         .prompt([
             {
                 name: "productID",
                 type: "rawlist",
+                message: "Please enter the ID of the item you would like to purchase.",
                 choices: function () {
                     var choicesArr = [];
                     for (var i = 0; i < results.length; i++) {
@@ -117,14 +120,15 @@ function viewCart() {
             displayCart(cartID, itemQuantity);
         }
     } else {
-        console.log("Sorry, your cart is empty.  Please add an item and check back later.\n");
+        
+        console.log("\n" + "Sorry, your cart is empty.  Please add an item and check back later.\n");
         console.log("Taking you back to the home page...\n");
         displayProducts()
     }
 }
 
 function displayCart(id, quantity) {
-    var orderTotal = 0;
+    var orderTotal = "";
     connection.query("SELECT product_name, price FROM products WHERE id = " + id, function (error, results) {
         if (error) throw error;
         for (var i = 0; i < results.length; i++) {
@@ -137,9 +141,92 @@ function displayCart(id, quantity) {
             orderTotal += itemTotal;
         }
         // Log order total
-        console.log("Your order total is $" + orderTotal);
-        finalizePurchase();
+        console.log("Your order total is $" + orderTotal + "\n");
+        // Ask if they would like to continue shopping or complete purchase
+        inquirer
+        .prompt([
+            {
+                name: "confirmPurchase",
+                type: "rawlist",
+                message: "What would you like to do next?",
+                choices: [
+                    'Return to store',
+                    'Go to checkout'
+                ]
+            }
+        ]).then(function (answers) {
+            if (answers.confirmPurchase === 'Return to store') {
+                console.log("Return to the homepage...\n");
+                displayProducts();
+            } else {
+                console.log("Taking you to the payment page...\n");
+                paymentPage(orderTotal);
+            }
+        })
     })
+}
+
+function paymentPage (orderTotal) {
+    console.log("Your order total is $" + orderTotal + "\n")
+    console.log("Please enter your shipping information...\n");
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'first_name',
+                message: "What's your first name?"
+              },
+              {
+                type: 'input',
+                name: 'last_name',
+                message: "What's your last name?",
+                default: function() {
+                  return 'Doe';
+                }
+              },
+              {
+                type: 'input',
+                name: 'address',
+                message: "What's your address",
+              },
+              {
+                  type: 'input',
+                  name: 'email',
+                  message: "What's your email?",
+                  validate: function(value) {
+                      var pass = value.match(
+                        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                      );
+                      if (pass) {
+                          return true;
+                      }
+                      return 'Please enter a valid email address'
+                  }
+              },
+              {
+                type: 'input',
+                name: 'phone',
+                message: "What's your phone number?",
+                validate: function(value) {
+                  var pass = value.match(
+                    /^([01]{1})?[-.\s]?\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})\s?((?:#|ext\.?\s?|x\.?\s?){1}(?:\d+)?)?$/i
+                  );
+                  if (pass) {
+                    return true;
+                  }
+            
+                  return 'Please enter a valid phone number';
+                }
+              }
+        ]).then(function (answers) {
+            var userInfo = {
+                first_name: answers.first_name, last_name: answers.last_name, address: answers.address, email: answers.email, phone: answers.phone
+            };
+            console.log("\n");
+            console.table(userInfo);
+            console.log("\n");
+            finalizePurchase(userInfo);
+        })
 }
 
 // Placing order, check against quantity in database
