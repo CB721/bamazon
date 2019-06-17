@@ -17,8 +17,29 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    displayProducts()
+    start()
 });
+
+// Open page icon
+function start () {
+    console.log("\n");
+    console.log("*********************                                           ****");
+    console.log("***********************                                         ****");
+    console.log("************************                                        ****");
+    console.log("*****               *****                                       ****");
+    console.log("*****                ****                                       ****");
+    console.log("*****               *****                                       ****");
+    console.log("************************                                        ****");
+    console.log("************************                                        ****");
+    console.log("*****               *****    *************    *************");
+    console.log("*****                ****    *************    *************");
+    console.log("*****               *****    ****     ****    *** ***** ***     ****");
+    console.log("************************     ****     ****    ***  ***  ***     ****");
+    console.log("***********************      ********** **    ***   *   ***     ****");
+    console.log("**********************       *********  **    ***       ***     ****");
+    console.log("\n");
+    displayProducts();
+}
 
 // Display all available items
 function displayProducts() {
@@ -120,7 +141,7 @@ function viewCart() {
             displayCart(cartID, itemQuantity);
         }
     } else {
-        
+        // If cart is empty, display error
         console.log("\n" + "Sorry, your cart is empty.  Please add an item and check back later.\n");
         console.log("Taking you back to the home page...\n");
         displayProducts()
@@ -142,46 +163,54 @@ function displayCart(id, quantity) {
         }
         // Log order total
         console.log("Your order total is $" + orderTotal + "\n");
-        // Ask if they would like to continue shopping or complete purchase
-        inquirer
-        .prompt([
-            {
-                name: "confirmPurchase",
-                type: "rawlist",
-                message: "What would you like to do next?",
-                choices: [
-                    'Return to store',
-                    'Go to checkout'
-                ]
-            }
-        ]).then(function (answers) {
-            if (answers.confirmPurchase === 'Return to store') {
-                console.log("Return to the homepage...\n");
-                displayProducts();
-            } else {
-                console.log("Taking you to the payment page...\n");
-                paymentPage(orderTotal);
-            }
-        })
+        confirmTotal();
     })
 }
 
-function paymentPage (orderTotal) {
-    console.log("Your order total is $" + orderTotal + "\n")
+function confirmTotal () {
+    // Ask if they would like to continue shopping or complete purchase
+    inquirer
+    .prompt([
+        {
+            name: "confirmPurchase",
+            type: "rawlist",
+            message: "What would you like to do next?",
+            choices: [
+                'Return to store',
+                'Go to checkout'
+            ]
+        }
+    ]).then(function (answers) {
+        if (answers.confirmPurchase === 'Return to store') {
+            console.log("Return to the homepage...\n");
+            displayProducts();
+        } else if (answers.confirmPurchase === 'Go to checkout') {
+            console.log("Taking you to the payment page...\n");
+            paymentPage();
+        } else {
+            console.log("Invalid selection.\n");
+        }
+    })
+}
+
+function paymentPage () {
     console.log("Please enter your shipping information...\n");
     inquirer
         .prompt([
             {
                 type: 'input',
                 name: 'first_name',
-                message: "What's your first name?"
+                message: "What's your first name?",
+                default: function() {
+                    return 'Will';
+                  }
               },
               {
                 type: 'input',
                 name: 'last_name',
                 message: "What's your last name?",
                 default: function() {
-                  return 'Doe';
+                  return 'Smith';
                 }
               },
               {
@@ -193,6 +222,7 @@ function paymentPage (orderTotal) {
                   type: 'input',
                   name: 'email',
                   message: "What's your email?",
+                  // Provide error if user inputs an invalid email address
                   validate: function(value) {
                       var pass = value.match(
                         /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -207,6 +237,7 @@ function paymentPage (orderTotal) {
                 type: 'input',
                 name: 'phone',
                 message: "What's your phone number?",
+                // Provide error if user inputs an invalid phone number
                 validate: function(value) {
                   var pass = value.match(
                     /^([01]{1})?[-.\s]?\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})\s?((?:#|ext\.?\s?|x\.?\s?){1}(?:\d+)?)?$/i
@@ -239,7 +270,7 @@ function stockUpdate(orderQuantity, itemID) {
         // Updated quantity available in database
         var updateQuantity = dbQuantity - orderQuantity;
         // If there is enough
-        if (updateQuantity > 0) {
+        if (updateQuantity >= 0) {
             // Order success message
             console.log("Added " + orderQuantity + " " + results[0].product_name + "'s to your cart!\n");
             // Subtract from database
