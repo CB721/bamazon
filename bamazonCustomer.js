@@ -20,6 +20,7 @@ connection.connect(function (err) {
     start()
 });
 
+
 // Open page icon
 function start() {
     console.log("\n");
@@ -53,13 +54,16 @@ function displayProducts() {
             .prompt([
                 {
                     name: "cartView",
-                    type: "confirm",
-                    message: "Would you like to view your cart?",
-                    default: true
+                    type: "rawlist",
+                    message: "Would you like to do?",
+                    choices: [
+                        "Shop!",
+                        "View my cart"
+                    ]
                 }
             ])
             .then(function (response) {
-                if (response.cartView) {
+                if (response.cartView === "View my cart") {
                     // Go to cart
                     checkCart();
                 } else {
@@ -112,7 +116,7 @@ function stockUpdate(orderQuantity, itemID) {
             // Order success message
             console.log("Added " + orderQuantity + " " + results[0].product_name + "'s to your cart!\n");
             // Subtract from database
-            connection.query("UPDATE products SET stock_quantity =' " + updateQuantity + " 'WHERE id = " + itemID, function (error, results2) {
+            connection.query("UPDATE products SET stock_quantity =' " + updateQuantity + " 'WHERE id = " + itemID, function (error) {
                 if (error) throw error;
             })
             // Push object to cart array
@@ -150,6 +154,7 @@ function checkCart() {
         };
         var functionOrder = async function () {
             const random = await soMuchCart();
+            const randomMore = await orderTotal();
             const randomToo = await confirmTotal();
         }
         functionOrder();
@@ -161,46 +166,53 @@ function checkCart() {
     }
 }
 
+// Empty array for order total
+var orderTotalArr = [];
+
 function displayCart(item, quantity, price) {
-    var orderTotal = "";
-        // Item total rounded to two decimal places
-        var itemTotal = (price * quantity).toFixed(2);
-        // Log each item with total
-        console.log(item + " Quantity: " + quantity + " Price per item: $" + price + " Item Total: $" + itemTotal + "\n");
-        orderTotal += itemTotal;
-        // Log order total
-        console.log("Your order total is $" + orderTotal + "\n");
+    // Item total rounded to two decimal places
+    var itemTotal = (price * quantity).toFixed(2);
+    // Log each item with total
+    console.log(item + " Quantity: " + quantity + " Price per item: $" + price + " Item Total: $" + itemTotal + "\n");
+    // Add each item total to order total array
+    orderTotalArr.push(itemTotal);
+    console.log("order total array " + orderTotalArr);
+}
+
+function orderTotal () {
+    var total = 0;
+    for (var i = 0; i < orderTotalArr.length; i++) {
+        total += orderTotalArr[i];
+    }
+    console.log("Order total: " + total + "\n");
 }
 
 function confirmTotal() {
     return new Promise(resolve => {
-        // Delay confirm purchase prompt until display cart function has finished
-        setTimeout(function () {
-            // Ask if they would like to continue shopping or complete purchase
-            inquirer
-                .prompt([
-                    {
-                        name: "confirmPurchase",
-                        type: "rawlist",
-                        message: "What would you like to do next?",
-                        choices: [
-                            'Continue shopping!',
-                            'Go to checkout'
-                        ]
-                    }
-                ]).then(function (answers) {
-                    if (answers.confirmPurchase === 'Continue shopping!') {
-                        console.log("Return to the homepage...\n");
-                        displayProducts();
-                    } else if (answers.confirmPurchase === 'Go to checkout') {
-                        console.log("Taking you to the payment page...\n");
-                        paymentPage();
-                    } else {
-                        console.log("Invalid selection.\n");
-                    }
-                })
-            resolve();
-        }, 1000);
+        // Ask if they would like to continue shopping or complete purchase
+        inquirer
+            .prompt([
+                {
+                    name: "confirmPurchase",
+                    type: "rawlist",
+                    message: "What would you like to do next?",
+                    choices: [
+                        'Continue shopping!',
+                        'Checkout'
+                    ]
+                }
+            ]).then(function (answers) {
+                if (answers.confirmPurchase === 'Continue shopping!') {
+                    console.log("Returning to the item selection page...\n");
+                    displayProducts();
+                } else if (answers.confirmPurchase === 'Checkout') {
+                    console.log("Taking you to the payment page...\n");
+                    paymentPage();
+                } else {
+                    console.log("Invalid selection.\n");
+                }
+            })
+        resolve();
     });
 }
 
