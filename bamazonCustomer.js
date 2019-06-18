@@ -44,7 +44,6 @@ function start() {
 
 function displayProducts() {
     console.log("Welcome to Bamazon!\n");
-    console.log("Home ")
     connection.query("SELECT * FROM products", function (error, results) {
         if (error) throw error;
         console.table(results);
@@ -138,11 +137,21 @@ var cart = [];
 function checkCart() {
     // Check if anything is in the cart
     if (cart.length > 0) {
-        for (var i = 0; i < cart.length; i++) {
-            var itemQuantity = cart[i].quantity
-            var cartID = cart[i].id;
-            displayCart(cartID, itemQuantity);
+        var soMuchCart = function () {
+            return new Promise(resolve => {
+                for (var i = 0; i < cart.length; i++) {
+                    var itemQuantity = cart[i].quantity
+                    var cartID = cart[i].id;
+                    displayCart(cartID, itemQuantity);
+                }
+                resolve();
+            });
+        };
+        var functionOrder = async function () {
+            const random = await soMuchCart();
+            const randomToo = await confirmTotal();
         }
+        functionOrder();
     } else {
         // If cart is empty, display error
         console.log("\n" + "Sorry, your cart is empty.  Please add an item and check back later.\n");
@@ -155,45 +164,50 @@ function displayCart(id, quantity) {
     var orderTotal = "";
     connection.query("SELECT product_name, price FROM products WHERE id = " + id, function (error, results) {
         if (error) throw error;
-        
-            // Get price from db
-            var itemPrice = results[0].price;
-            // Item total rounded to two decimal places
-            var itemTotal = (itemPrice * quantity).toFixed(2);
-            // Log each item with total
-            console.log(results[0].product_name + " Quantity: " + quantity + " Price per item: $" + itemPrice + " Item Total: $" + itemTotal + "\n");
-            orderTotal += itemTotal;
-        
+        // Get price from db
+        var itemPrice = results[0].price;
+        // Item total rounded to two decimal places
+        var itemTotal = (itemPrice * quantity).toFixed(2);
+        // Log each item with total
+        console.log("\nLine 163" + results[0].product_name + " Quantity: " + quantity + " Price per item: $" + itemPrice + " Item Total: $" + itemTotal + "\n");
+        orderTotal += itemTotal;
         // Log order total
         console.log("Your order total is $" + orderTotal + "\n");
-        confirmTotal();
+
     })
 }
 
 function confirmTotal() {
-    // Ask if they would like to continue shopping or complete purchase
-    inquirer
-        .prompt([
-            {
-                name: "confirmPurchase",
-                type: "rawlist",
-                message: "What would you like to do next?",
-                choices: [
-                    'Continue shopping!',
-                    'Go to checkout'
-                ]
-            }
-        ]).then(function (answers) {
-            if (answers.confirmPurchase === 'Continue shopping!') {
-                console.log("Return to the homepage...\n");
-                displayProducts();
-            } else if (answers.confirmPurchase === 'Go to checkout') {
-                console.log("Taking you to the payment page...\n");
-                paymentPage();
-            } else {
-                console.log("Invalid selection.\n");
-            }
-        })
+    return new Promise(resolve => {
+        // Delay confirm purchase prompt until display cart function has finished
+        setTimeout(function () {
+            // Ask if they would like to continue shopping or complete purchase
+            inquirer
+                .prompt([
+                    {
+                        name: "confirmPurchase",
+                        type: "rawlist",
+                        message: "What would you like to do next?",
+                        choices: [
+                            'Continue shopping!',
+                            'Go to checkout'
+                        ]
+                    }
+                ]).then(function (answers) {
+                    if (answers.confirmPurchase === 'Continue shopping!') {
+                        console.log("Return to the homepage...\n");
+                        displayProducts();
+                    } else if (answers.confirmPurchase === 'Go to checkout') {
+                        console.log("Taking you to the payment page...\n");
+                        paymentPage();
+                    } else {
+                        console.log("Invalid selection.\n");
+                    }
+                })
+            resolve();
+        }, 1000);
+    });
+
 }
 
 function paymentPage() {
