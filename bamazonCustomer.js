@@ -116,7 +116,7 @@ function stockUpdate(orderQuantity, itemID) {
                 if (error) throw error;
             })
             // Push object to cart array
-            var orderValue = { id: itemID, quantity: orderQuantity };
+            var orderValue = { item: results[0].product_name, quantity: orderQuantity, price: results[0].price };
             // Push to cart array
             cart.push(orderValue)
             // Go to cart
@@ -141,8 +141,9 @@ function checkCart() {
             return new Promise(resolve => {
                 for (var i = 0; i < cart.length; i++) {
                     var itemQuantity = cart[i].quantity
-                    var cartID = cart[i].id;
-                    displayCart(cartID, itemQuantity);
+                    var item = cart[i].item;
+                    var price = cart[i].price;
+                    displayCart(item, itemQuantity, price);
                 }
                 resolve();
             });
@@ -160,20 +161,15 @@ function checkCart() {
     }
 }
 
-function displayCart(id, quantity) {
+function displayCart(item, quantity, price) {
     var orderTotal = "";
-    connection.query("SELECT product_name, price FROM products WHERE id = " + id, function (error, results) {
-        if (error) throw error;
-        // Get price from db
-        var itemPrice = results[0].price;
         // Item total rounded to two decimal places
-        var itemTotal = (itemPrice * quantity).toFixed(2);
+        var itemTotal = (price * quantity).toFixed(2);
         // Log each item with total
-        console.log(results[0].product_name + " Quantity: " + quantity + " Price per item: $" + itemPrice + " Item Total: $" + itemTotal + "\n");
+        console.log(item + " Quantity: " + quantity + " Price per item: $" + price + " Item Total: $" + itemTotal + "\n");
         orderTotal += itemTotal;
         // Log order total
         console.log("Your order total is $" + orderTotal + "\n");
-    })
 }
 
 function confirmTotal() {
