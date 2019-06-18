@@ -169,11 +169,10 @@ function displayCart(id, quantity) {
         // Item total rounded to two decimal places
         var itemTotal = (itemPrice * quantity).toFixed(2);
         // Log each item with total
-        console.log("\nLine 163" + results[0].product_name + " Quantity: " + quantity + " Price per item: $" + itemPrice + " Item Total: $" + itemTotal + "\n");
+        console.log(results[0].product_name + " Quantity: " + quantity + " Price per item: $" + itemPrice + " Item Total: $" + itemTotal + "\n");
         orderTotal += itemTotal;
         // Log order total
         console.log("Your order total is $" + orderTotal + "\n");
-
     })
 }
 
@@ -207,7 +206,6 @@ function confirmTotal() {
             resolve();
         }, 1000);
     });
-
 }
 
 function paymentPage() {
@@ -234,11 +232,17 @@ function paymentPage() {
                 type: 'input',
                 name: 'address',
                 message: "What's your address?",
+                default: function () {
+                    return 'West Philadephia'
+                }
             },
             {
                 type: 'input',
                 name: 'email',
                 message: "What's your email?",
+                default: function () {
+                    return 'freshprince@belair.gov'
+                },
                 // Provide error if user inputs an invalid email address
                 validate: function (value) {
                     var pass = value.match(
@@ -254,6 +258,9 @@ function paymentPage() {
                 type: 'input',
                 name: 'phone',
                 message: "What's your phone number?",
+                default: function () {
+                    return '2061234567'
+                },
                 // Provide error if user inputs an invalid phone number
                 validate: function (value) {
                     var pass = value.match(
