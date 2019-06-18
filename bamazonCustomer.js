@@ -23,20 +23,20 @@ connection.connect(function (err) {
 // Open page icon
 function start() {
     console.log("\n");
-    console.log("********************                                           ****");
+    console.log("*******************                                            ****");
     console.log("**********************                                         ****");
     console.log("***********************                                        ****");
     console.log("****               *****                                       ****");
     console.log("****                ****                                       ****");
     console.log("****               *****                                       ****");
     console.log("***********************                                        ****");
-    console.log("***********************                                        ****");
+    console.log("***********************      ***********     ****** ******     ****");
     console.log("****               *****    *************    *************");
     console.log("****                ****    *************    *************");
     console.log("****               *****    ****     ****    *** ***** ***     ****");
     console.log("***********************     ****     ****    ***  ***  ***     ****");
     console.log("**********************      ********** **    ***   *   ***     ****");
-    console.log("*********************       *********  **    ***       ***     ****");
+    console.log("*********************        ********  **    ***       ***     ****");
     console.log("\n");
     displayProducts();
 }
@@ -62,7 +62,7 @@ function displayProducts() {
             .then(function (response) {
                 if (response.cartView) {
                     // Go to cart
-                    viewCart();
+                    checkCart();
                 } else {
                     makePurchase(results);
                 }
@@ -121,7 +121,7 @@ function stockUpdate(orderQuantity, itemID) {
             // Push to cart array
             cart.push(orderValue)
             // Go to cart
-            viewCart();
+            checkCart();
         } else {
             // If there isn't enought - insufficient quantity message and prevent order from going through
             console.log("Insufficient quantity.  Please check availability and try again.\n");
@@ -135,7 +135,7 @@ function stockUpdate(orderQuantity, itemID) {
 // Empty array for the cart
 var cart = [];
 
-function viewCart() {
+function checkCart() {
     // Check if anything is in the cart
     if (cart.length > 0) {
         for (var i = 0; i < cart.length; i++) {
@@ -155,7 +155,7 @@ function displayCart(id, quantity) {
     var orderTotal = "";
     connection.query("SELECT product_name, price FROM products WHERE id = " + id, function (error, results) {
         if (error) throw error;
-        for (var i = 0; i < results.length; i++) {
+        
             // Get price from db
             var itemPrice = results[0].price;
             // Item total rounded to two decimal places
@@ -163,7 +163,7 @@ function displayCart(id, quantity) {
             // Log each item with total
             console.log(results[0].product_name + " Quantity: " + quantity + " Price per item: $" + itemPrice + " Item Total: $" + itemTotal + "\n");
             orderTotal += itemTotal;
-        }
+        
         // Log order total
         console.log("Your order total is $" + orderTotal + "\n");
         confirmTotal();
@@ -219,7 +219,7 @@ function paymentPage() {
             {
                 type: 'input',
                 name: 'address',
-                message: "What's your address",
+                message: "What's your address?",
             },
             {
                 type: 'input',
@@ -270,19 +270,20 @@ function finalizePurchase(userInfo) {
             {
                 name: "purchase",
                 type: "confirm",
-                message: "Would you like to proceed with your purchase?",
+                message: "Please confirm your shipping details...",
                 default: true
             }
         ]).then(function (response) {
             if (response.purchase) {
-                console.log(userInfo.first_name + " you have completed your purchase.  Thank you for your business!\n");
+                console.log("\n" + userInfo.first_name + " you have completed your purchase.  Thank you for your business!\n");
                 console.log("Signing out...\n");
                 console.log("---------------------------------------------------------------\n");
                 // empty cart function
                 emptyCart();
                 start();
             } else {
-                displayProducts();
+                console.log("\n");
+                paymentPage();
             }
         })
 }
