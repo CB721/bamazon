@@ -138,6 +138,11 @@ function stockUpdate(orderQuantity, itemID) {
 // Empty array for the cart
 var cart = [];
 
+// Clear all values from cart array
+function emptyCart() {
+    cart.length = 0;
+}
+
 function checkCart() {
     // Check if anything is in the cart
     if (cart.length > 0) {
@@ -169,22 +174,27 @@ function checkCart() {
 // Empty array for order total
 var orderTotalArr = [];
 
+// Empty order total array if user does not complete purchase
+    //  If not emptied, it will keep re-adding the same items and give a false total
+function emptyOrderTotal () {
+    orderTotalArr.length = 0;
+}
+
 function displayCart(item, quantity, price) {
     // Item total rounded to two decimal places
     var itemTotal = (price * quantity).toFixed(2);
     // Log each item with total
-    console.log(item + " Quantity: " + quantity + " Price per item: $" + price + " Item Total: $" + itemTotal + "\n");
+    console.log(item + " || " + " Quantity: " + quantity + " || " + " Price per item: $" + price + " || " + " Item Total: $" + itemTotal + "\n");
     // Add each item total to order total array
     orderTotalArr.push(itemTotal);
-    console.log("order total array " + orderTotalArr);
 }
 
 function orderTotal () {
     var total = 0;
     for (var i = 0; i < orderTotalArr.length; i++) {
-        total += orderTotalArr[i];
+        total += parseFloat(orderTotalArr[i]);
     }
-    console.log("Order total: " + total + "\n");
+    console.log("Order total: $" + total + "\n");
 }
 
 function confirmTotal() {
@@ -204,6 +214,7 @@ function confirmTotal() {
             ]).then(function (answers) {
                 if (answers.confirmPurchase === 'Continue shopping!') {
                     console.log("Returning to the item selection page...\n");
+                    emptyOrderTotal();
                     displayProducts();
                 } else if (answers.confirmPurchase === 'Checkout') {
                     console.log("Taking you to the payment page...\n");
@@ -280,10 +291,15 @@ function paymentPage() {
 
                     return 'Please enter a valid phone number';
                 }
+            },
+            {
+                type: 'input',
+                name: 'creditcard',
+                message: "Please enter your credit card number..."
             }
         ]).then(function (answers) {
             var userInfo = {
-                first_name: answers.first_name, last_name: answers.last_name, address: answers.address, email: answers.email, phone: answers.phone
+                first_name: answers.first_name, last_name: answers.last_name, address: answers.address, email: answers.email, phone: answers.phone, payment: answers.creditcard
             };
             console.log("\n");
             console.table(userInfo);
@@ -309,15 +325,13 @@ function finalizePurchase(userInfo) {
                 console.log("---------------------------------------------------------------\n");
                 // empty cart function
                 emptyCart();
+                // empty order total
+                emptyOrderTotal();
+                // Restart application
                 start();
             } else {
                 console.log("\n");
                 paymentPage();
             }
         })
-}
-
-// Clear all values from cart array
-function emptyCart() {
-    cart.length = 0;
 }
