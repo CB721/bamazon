@@ -1,17 +1,23 @@
 //inquirer for prompts
 var inquirer = require("inquirer");
+
 //mysql for database
 var mysql = require("mysql");
+
 //env to hide database password
 require("dotenv").config();
+
 //console.table for console formatting
 var cTable = require('console.table');
+
+//Import the keys file and store it in a variable
+var keys = require("./keys.js");
 
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: "9z5-gwF-kBn-BCy",
+    password: keys.sqlDatabase.password,
     database: "bamazon_db"
 });
 
@@ -24,7 +30,7 @@ connection.connect(function (err) {
 // Open page icon
 function start() {
     console.log("\n");
-    console.log("*******************                                            ****");
+    console.log("*********************                                          ****");
     console.log("**********************                                         ****");
     console.log("***********************                                        ****");
     console.log("****               *****                                       ****");
@@ -33,7 +39,7 @@ function start() {
     console.log("***********************                                        ****");
     console.log("***********************      ***********     ****** ******     ****");
     console.log("****               *****    *************    *************");
-    console.log("****                ****    *************    *************");
+    console.log("****                ****    ****     ****    *************");
     console.log("****               *****    ****     ****    *** ***** ***     ****");
     console.log("***********************     ****     ****    ***  ***  ***     ****");
     console.log("**********************      ********** **    ***   *   ***     ****");
