@@ -11,3 +11,5 @@ After the quantity has been entered, the user is presented with the option to ei
 From there, the user is again asked if they would like to continue shopping or if they would like to proceed with checkout.  If they proceed with checkout, they are prompted to provide their name, address and contact information.  If the user attempts to put in an invalid email or phone number, they are prompted to enter a valid one.  The user is then asked to confirm shipping details and if they are incorrect, they are prompted again to enter their shipping information.
 
 Once all of the shipping information has been collected, they are asked one final time if they would like to complete the purchase.  If they say no, they are redirected to the products list.  If they say yes, they are thanked for their purchase, their cart is emptied and they are taken back to the opening logo page.
+
+To run this file, you will need to create a keys.js file and an .env file.
