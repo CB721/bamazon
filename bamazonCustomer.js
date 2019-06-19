@@ -175,8 +175,8 @@ function checkCart() {
 var orderTotalArr = [];
 
 // Empty order total array if user does not complete purchase
-    //  If not emptied, it will keep re-adding the same items and give a false total
-function emptyOrderTotal () {
+//  If not emptied, it will keep re-adding the same items and give a false total
+function emptyOrderTotal() {
     orderTotalArr.length = 0;
 }
 
@@ -189,7 +189,7 @@ function displayCart(item, quantity, price) {
     orderTotalArr.push(itemTotal);
 }
 
-function orderTotal () {
+function orderTotal() {
     var total = 0;
     for (var i = 0; i < orderTotalArr.length; i++) {
         total += parseFloat(orderTotalArr[i]);
@@ -288,14 +288,23 @@ function paymentPage() {
                     if (pass) {
                         return true;
                     }
-
                     return 'Please enter a valid phone number';
                 }
             },
             {
                 type: 'input',
                 name: 'creditcard',
-                message: "Please enter your credit card number..."
+                message: "Please enter your credit card number",
+                // Provide error if user inputs a valid credit card number
+                validate: function (value) {
+                    var pass = value.match(
+                        /^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/g
+                    );
+                    if (pass) {
+                        return true;
+                    }
+                    return 'Please enter a valid credit card number';
+                }
             }
         ]).then(function (answers) {
             var userInfo = {
