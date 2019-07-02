@@ -19,4 +19,3 @@ To run this file, you will need to create a keys.js file and an .env file.
 Technologies used:
 Node.js
 SQL
-Firebase
