@@ -12,4 +12,11 @@ From there, the user is again asked if they would like to continue shopping or i
 
 Once all of the shipping information has been collected, they are asked one final time if they would like to complete the purchase.  If they say no, they are redirected to the products list.  If they say yes, they are thanked for their purchase, their cart is emptied and they are taken back to the opening logo page.
 
-To run this file, you will need to create a keys.js file and an .env file.  Please see the walkthrough video for a demonstration of the app.
+![bamazon-walkthrough](Walkthrough/Bamazon-App-Walkthrough.gif)
+
+To run this file, you will need to create a keys.js file and an .env file.
+
+Technologies used:
+Node.js
+SQL
+Firebase
